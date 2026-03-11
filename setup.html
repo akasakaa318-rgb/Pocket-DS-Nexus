@@ -3,25 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pocket-DS-Nexus Setup</title>
+    <title>Pocket-DS-Nexus - Tomodachi</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; background: #fdfdfd; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; background: #000; }
         .screen { display: none; width: 100%; height: 100%; position: absolute; flex-direction: column; align-items: center; justify-content: center; }
         .active { display: flex; }
 
-        /* セットアップボックス */
+        /* セットアップ */
+        #step-setup { background: #fdfdfd; }
         .setup-box { background: white; padding: 40px 20px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 85%; text-align: center; border: 1px solid #eee; }
         input { width: 90%; padding: 15px; margin: 25px 0; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 18px; text-align: center; outline: none; }
         .btn-next { background: #007aff; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .btn-skip { margin-top: 20px; color: #888; font-size: 14px; text-decoration: underline; cursor: pointer; background: none; border: none; }
-        
-        /* 簡易ホーム */
+
+        /* ホーム画面 (DSi風) */
         #home-view { background: #ebebeb; }
         .status-bar { position: absolute; top: 0; width: 100%; height: 45px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-weight: bold; border-bottom: 1px solid #ddd; }
+        .app-card { width: 140px; height: 140px; background: white; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; }
+        .app-label { margin-top: 10px; font-weight: bold; color: #444; font-size: 14px; }
+
+        /* トモコレ画面 (ダミー) */
+        #game-view { background: #87CEEB; color: white; } /* 空色の背景 */
+        .island { font-size: 100px; margin-bottom: 20px; }
 
         /* エラー画面 */
-        #error-view { background: black; color: white; }
-        .error-msg { border: 2px solid white; padding: 25px; width: 80%; font-weight: bold; line-height: 1.8; text-align: center; }
+        #error-view { background: black; color: white; text-align: center; }
+        .error-msg { border: 2px solid white; padding: 25px; width: 80%; font-weight: bold; line-height: 1.8; }
     </style>
 </head>
 <body>
@@ -32,8 +38,6 @@
             <p style="color:#666;">なまえを 入力してください</p>
             <input type="text" id="userName" placeholder="あかさか" maxlength="10">
             <button class="btn-next" onclick="toHome()">つぎへ</button>
-            <br>
-            <button class="btn-skip" onclick="toHome('ゲスト')">スキップする</button>
         </div>
     </div>
 
@@ -42,17 +46,25 @@
             <span id="display-name">User</span>
             <span id="clock">00:00</span>
         </div>
-        <div style="text-align:center;" onclick="toError()">
-            <div style="font-size:60px;">🎮</div>
-            <p style="font-weight:bold; color:#444;">ソフトをはじめる</p>
+        <div class="app-card" onclick="startGame()">
+            <div style="font-size:50px;">🏝️</div>
+            <div class="app-label">トモダチコレクション</div>
         </div>
+        <p style="margin-top:20px; color:#999; font-size:12px;">カセットを読み込みました</p>
+    </div>
+
+    <div id="game-view" class="screen">
+        <div class="island">🏝️</div>
+        <h3>トモダチコレクション</h3>
+        <p>Miiたちが 暮らしています...</p>
+        <button onclick="toError()" style="margin-top:50px; background:rgba(0,0,0,0.2); color:white; border:1px solid white; padding:10px; border-radius:10px;">(カセットを抜く動作)</button>
     </div>
 
     <div id="error-view" class="screen" onclick="location.reload()">
         <div class="error-msg">
             [カセットが抜かれた為ソフトを停止しました]
         </div>
-        <p style="margin-top:30px; color:#555; font-size:12px;">タップして最初から</p>
+        <p style="margin-top:30px; color:#555; font-size:12px;">タップで再起動</p>
     </div>
 
     <script>
@@ -61,13 +73,16 @@
             document.getElementById(id).classList.add('active');
         }
 
-        function toHome(fallbackName) {
-            const nameInput = document.getElementById('userName').value;
-            // 入力があればそれを使う、なければスキップ用の名前（ゲスト等）を使う
-            const finalName = nameInput || fallbackName || "あかさか";
-            document.getElementById('display-name').innerText = finalName;
+        function toHome() {
+            const name = document.getElementById('userName').value || "あかさか";
+            document.getElementById('display-name').innerText = name;
             show('home-view');
             startClock();
+        }
+
+        function startGame() {
+            // ロード演出を入れたい場合はここにsetTimeoutを挟めます
+            show('game-view');
         }
 
         function toError() {
