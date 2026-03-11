@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pocket-DS-Nexus - Tomodachi</title>
+    <title>Pocket-DS-Nexus - Mii News</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; background: #000; }
         .screen { display: none; width: 100%; height: 100%; position: absolute; flex-direction: column; align-items: center; justify-content: center; }
@@ -15,15 +15,17 @@
         input { width: 90%; padding: 15px; margin: 25px 0; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 18px; text-align: center; outline: none; }
         .btn-next { background: #007aff; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; }
 
-        /* ホーム画面 (DSi風) */
+        /* ホーム画面 */
         #home-view { background: #ebebeb; }
         .status-bar { position: absolute; top: 0; width: 100%; height: 45px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-weight: bold; border-bottom: 1px solid #ddd; }
         .app-card { width: 140px; height: 140px; background: white; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; }
-        .app-label { margin-top: 10px; font-weight: bold; color: #444; font-size: 14px; }
 
-        /* トモコレ画面 (ダミー) */
-        #game-view { background: #87CEEB; color: white; } /* 空色の背景 */
-        .island { font-size: 100px; margin-bottom: 20px; }
+        /* トモコレ画面 & Miiニュース */
+        #game-view { background: #87CEEB; }
+        .news-ticker { position: absolute; bottom: 80px; width: 100%; background: rgba(0,0,0,0.7); color: yellow; padding: 10px 0; font-weight: bold; overflow: hidden; white-space: nowrap; }
+        .news-text { display: inline-block; padding-left: 100%; animation: scroll-news 15s linear infinite; }
+        @keyframes scroll-news { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .island-icon { font-size: 100px; margin-bottom: 20px; }
 
         /* エラー画面 */
         #error-view { background: black; color: white; text-align: center; }
@@ -48,26 +50,34 @@
         </div>
         <div class="app-card" onclick="startGame()">
             <div style="font-size:50px;">🏝️</div>
-            <div class="app-label">トモダチコレクション</div>
+            <div style="font-weight:bold; color:#444; margin-top:10px;">トモダチコレクション</div>
         </div>
-        <p style="margin-top:20px; color:#999; font-size:12px;">カセットを読み込みました</p>
     </div>
 
     <div id="game-view" class="screen">
-        <div class="island">🏝️</div>
-        <h3>トモダチコレクション</h3>
-        <p>Miiたちが 暮らしています...</p>
-        <button onclick="toError()" style="margin-top:50px; background:rgba(0,0,0,0.2); color:white; border:1px solid white; padding:10px; border-radius:10px;">(カセットを抜く動作)</button>
+        <div class="island-icon">🏝️</div>
+        <h3 id="island-name">〇〇島</h3>
+        
+        <div class="news-ticker">
+            <span id="news-content" class="news-text">【Miiニュース】本日のニュースをお伝えします...</span>
+        </div>
+
+        <button onclick="toError()" style="margin-top:150px; background:rgba(0,0,0,0.2); color:white; border:1px solid white; padding:10px; border-radius:10px;">(カセットを抜く)</button>
     </div>
 
     <div id="error-view" class="screen" onclick="location.reload()">
-        <div class="error-msg">
-            [カセットが抜かれた為ソフトを停止しました]
-        </div>
-        <p style="margin-top:30px; color:#555; font-size:12px;">タップで再起動</p>
+        <div class="error-msg">[カセットが抜かれた為ソフトを停止しました]</div>
     </div>
 
     <script>
+        const newsItems = [
+            "【速報】島で一番高い山に、巨大なパンが落ちているのが発見されました。",
+            "【事件】喫茶店でMii同士が「どっちがかっこいいか」で3時間議論。店主が困惑。",
+            "【流行】最近、島では「寝たふり」をするのが大ブーム。至る所でMiiが寝ています。",
+            "【予報】明日の天気は、ところにより「大量のドーナツ」が降るでしょう。",
+            "【募集】誰か一緒に、お惣菜を眺める会に参加しませんか？"
+        ];
+
         function show(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -76,18 +86,23 @@
         function toHome() {
             const name = document.getElementById('userName').value || "あかさか";
             document.getElementById('display-name').innerText = name;
+            document.getElementById('island-name').innerText = name + "島";
             show('home-view');
             startClock();
         }
 
         function startGame() {
-            // ロード演出を入れたい場合はここにsetTimeoutを挟めます
             show('game-view');
+            // 定期的にニュースを更新
+            setInterval(updateNews, 15000); 
         }
 
-        function toError() {
-            show('error-view');
+        function updateNews() {
+            const randomNews = newsItems[Math.floor(Math.random() * newsItems.length)];
+            document.getElementById('news-content').innerText = randomNews;
         }
+
+        function toError() { show('error-view'); }
 
         function startClock() {
             const update = () => {
