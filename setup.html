@@ -13,12 +13,13 @@
         .setup-box { background: white; padding: 40px 20px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 85%; text-align: center; border: 1px solid #eee; }
         input { width: 90%; padding: 15px; margin: 25px 0; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 18px; text-align: center; outline: none; }
         .btn-next { background: #007aff; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .btn-skip { margin-top: 20px; color: #888; font-size: 14px; text-decoration: underline; cursor: pointer; background: none; border: none; }
         
         /* 簡易ホーム */
         #home-view { background: #ebebeb; }
         .status-bar { position: absolute; top: 0; width: 100%; height: 45px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-weight: bold; border-bottom: 1px solid #ddd; }
 
-        /* エラー画面 (真っ黒) */
+        /* エラー画面 */
         #error-view { background: black; color: white; }
         .error-msg { border: 2px solid white; padding: 25px; width: 80%; font-weight: bold; line-height: 1.8; text-align: center; }
     </style>
@@ -31,13 +32,15 @@
             <p style="color:#666;">なまえを 入力してください</p>
             <input type="text" id="userName" placeholder="あかさか" maxlength="10">
             <button class="btn-next" onclick="toHome()">つぎへ</button>
+            <br>
+            <button class="btn-skip" onclick="toHome('ゲスト')">スキップする</button>
         </div>
     </div>
 
     <div id="home-view" class="screen">
         <div class="status-bar">
             <span id="display-name">User</span>
-            <span>23:45</span>
+            <span id="clock">00:00</span>
         </div>
         <div style="text-align:center;" onclick="toError()">
             <div style="font-size:60px;">🎮</div>
@@ -58,14 +61,28 @@
             document.getElementById(id).classList.add('active');
         }
 
-        function toHome() {
-            const name = document.getElementById('userName').value || "あかさか";
-            document.getElementById('display-name').innerText = name;
+        function toHome(fallbackName) {
+            const nameInput = document.getElementById('userName').value;
+            // 入力があればそれを使う、なければスキップ用の名前（ゲスト等）を使う
+            const finalName = nameInput || fallbackName || "あかさか";
+            document.getElementById('display-name').innerText = finalName;
             show('home-view');
+            startClock();
         }
 
         function toError() {
             show('error-view');
+        }
+
+        function startClock() {
+            const update = () => {
+                const now = new Date();
+                document.getElementById('clock').innerText = 
+                    now.getHours().toString().padStart(2, '0') + ":" + 
+                    now.getMinutes().toString().padStart(2, '0');
+            };
+            update();
+            setInterval(update, 1000);
         }
     </script>
 </body>
