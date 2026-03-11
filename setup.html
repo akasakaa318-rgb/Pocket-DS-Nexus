@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初期設定 - Pocket-DS-Nexus</title>
+    <style>
+        body {
+            background-color: #f0f0f0; /* 3DS風の明るいグレー */
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .setup-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 80%;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 20px 0;
+        }
+        button {
+            background-color: #007aff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        .skip {
+            margin-top: 15px;
+            color: #888;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-box">
+        <h2>はじめまして！</h2>
+        <p>あなたの なまえを おしえてください</p>
+        <input type="text" placeholder="あかさか" id="userName">
+        <button onclick="saveName()">つぎへ</button>
+        <div class="skip" onclick="alert('スキップしました');">スキップする</div>
+    </div>
+
+    <script>
+        function saveName() {
+            const name = document.getElementById('userName').value;
+            alert('こんにちは、' + (name || 'ゲスト') + ' さん！');
+            // ここでメニュー画面に飛ばす処理を後で作ります
+        }
+    </script>
+</body>
+</html>
