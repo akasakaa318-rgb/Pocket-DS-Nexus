@@ -2,66 +2,72 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>初期設定 - Pocket-DS-Nexus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pocket-DS-Nexus Setup</title>
     <style>
-        body {
-            background-color: #f0f0f0; /* 3DS風の明るいグレー */
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .setup-box {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 80%;
-        }
-        input {
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            width: 100%;
-            box-sizing: border-box;
-            margin: 20px 0;
-        }
-        button {
-            background-color: #007aff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 16px;
-        }
-        .skip {
-            margin-top: 15px;
-            color: #888;
-            font-size: 14px;
-            text-decoration: underline;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; background: #fdfdfd; }
+        .screen { display: none; width: 100%; height: 100%; position: absolute; flex-direction: column; align-items: center; justify-content: center; }
+        .active { display: flex; }
+
+        /* 1. セットアップ画面 */
+        .setup-box { background: white; padding: 40px 20px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 85%; text-align: center; border: 1px solid #eee; }
+        input { width: 90%; padding: 15px; margin: 25px 0; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 18px; text-align: center; outline: none; }
+        .btn-next { background: #007aff; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; }
+
+        /* 2. ホーム画面 (簡易版) */
+        #home-view { background: #ebebeb; }
+        .status-bar { position: absolute; top: 0; width: 100%; height: 45px; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; font-weight: bold; border-bottom: 1px solid #ddd; }
+        .app-card { width: 120px; height: 120px; background: white; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+
+        /* 3. エラー画面 (カセット脱着) */
+        #error-view { background: black; color: white; text-align: center; }
+        .error-msg { border: 2px solid white; padding: 25px; width: 80%; font-weight: bold; line-height: 1.8; }
     </style>
 </head>
 <body>
-    <div class="setup-box">
-        <h2>はじめまして！</h2>
-        <p>あなたの なまえを おしえてください</p>
-        <input type="text" placeholder="あかさか" id="userName">
-        <button onclick="saveName()">つぎへ</button>
-        <div class="skip" onclick="alert('スキップしました');">スキップする</div>
+
+    <div id="step-setup" class="screen active">
+        <div class="setup-box">
+            <h2 style="margin:0;">はじめまして！</h2>
+            <p style="color:#666;">なまえを 入力してください</p>
+            <input type="text" id="userName" placeholder="あかさか" maxlength="10">
+            <button class="btn-next" onclick="toHome()">つぎへ</button>
+        </div>
+    </div>
+
+    <div id="home-view" class="screen">
+        <div class="status-bar">
+            <span id="display-name">User</span>
+            <span>12:00</span>
+        </div>
+        <div class="app-card" onclick="toError()">
+            <div style="font-size:40px;">🎮</div>
+            <div style="font-size:12px; font-weight:bold; margin-top:10px;">ソフトを起動</div>
+        </div>
+        <p style="margin-top:20px; color:#999; font-size:12px;">アイコンをタップしてね</p>
+    </div>
+
+    <div id="error-view" class="screen" onclick="location.reload()">
+        <div class="error-msg">
+            [カセットが抜かれた為ソフトを停止しました]
+        </div>
+        <p style="margin-top:30px; color:#555; font-size:12px;">タップで最初からやり直す</p>
     </div>
 
     <script>
-        function saveName() {
-            const name = document.getElementById('userName').value;
-            alert('こんにちは、' + (name || 'ゲスト') + ' さん！');
-            // ここでメニュー画面に飛ばす処理を後で作ります
+        function show(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function toHome() {
+            const name = document.getElementById('userName').value || "あかさか";
+            document.getElementById('display-name').innerText = name;
+            show('home-view');
+        }
+
+        function toError() {
+            show('error-view');
         }
     </script>
 </body>
